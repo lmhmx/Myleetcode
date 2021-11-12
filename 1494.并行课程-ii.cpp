@@ -5,6 +5,10 @@
  */
 
 // @lc code=start
+
+// 第一次失败的原因是没有考虑到中间越级的依赖关系，
+// 各个可以学的课程并不是完全等价的
+// 接下来考虑从最高级向下
 #include <vector>
 # include <iostream>
 using namespace std;
