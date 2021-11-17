@@ -43,37 +43,59 @@ public:
 private:
     void jumpTonext()
     {
-        // 从后往前数的第一个false,用于判定是否含有下一个
-        int first_false = -1;
-        for (int i = m_choose.size()-1;i>=0;i--)
+        // 最后一个
+        bool last = m_choose.back();
+        // 如果最后一个是0，那么往前找第1个1
+        // 如果是1，往前找第1个0和0前面的第1个1
+        if(last==false)
         {
-            if(m_choose[i] == true)
+            for (int i = m_choose.size()-1;i>=0;i--)
             {
-                if(i!=m_choose.size()-1)
+                if(m_choose[i] == true)
                 {
-                    if(m_choose[i+1] == false)
-                    {
-                        m_choose[i] = false;
-                        m_choose[i+1] = true;
-                        break;
-                    }
-                    else{
-                        continue;
-                    }
+                    m_choose[i] = false;
+                    m_choose[i+1] = true;
+                    return;
+                }
+            }
+        }
+        else  //最后一个是1
+        {
+            int num_1 = 1;
+            int find_0 = false;
+            for (int i = m_choose.size()-1;i>=0;i--)
+            {
+                if(m_choose[i] == false)
+                {
+                    find_0 = true;
                 }
                 else
                 {
-                    continue;
+                    if(!find_0)
+                    {
+                        num_1++;
+                    }
+                    else
+                    {
+                        m_choose[i] = false;
+                        for (int k=i+1;k<m_choose.size();k++)
+                        {
+                            if(k-i<=num_1)
+                            {
+                                m_choose[k]=true;
+                            }
+                            else
+                            {
+                                m_choose[k] = false;
+                            }
+                        }
+                        return;
+                    }
+                    
                 }
             }
-            else{
-                first_false = max(first_false, i);
-            }
         }
-        if(first_false == m_s.size() - m_n - 1)
-        {
-            m_hasnext = false;
-        }
+        m_hasnext = false;
     }
 private:
     string m_s;
