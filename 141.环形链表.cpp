@@ -18,19 +18,32 @@ struct ListNode {
 class Solution {
 public:
     bool hasCycle(ListNode *head) {
-        set<ListNode*> s;
-        ListNode* p = head;
-        while(p!=NULL)
+
+        ListNode* p = nullptr;
+        if(head != nullptr)
+        {   
+            p = head->next;
+        }
+        ListNode* q = head;
+        while(p!=nullptr && q!=nullptr)
         {
-            if(s.find(p)==s.end())
-            {
-                s.insert(p);
-            }
-            else
+            if(p==q)
             {
                 return true;
             }
-            p=p->next;
+            else
+            {
+                p=p->next;
+                if(p==nullptr)
+                {
+                    return false;
+                }
+                else
+                {
+                    p=p->next;
+                }
+                q=q->next;
+            }
         }
         return false;
     }
