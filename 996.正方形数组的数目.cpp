@@ -9,136 +9,74 @@
 # include <cmath>
 # include <set>
 # include <unordered_set>
+# include <unordered_map>
 # include <algorithm>
-using namespace std;
-class Solution {
-public:
-    int numSquarefulPerms(vector<int>& nums) 
+using namespace std;class Solution {
+private:
+    unordered_map<int, int> num2cnt;
+    unordered_map<int, vector<int>> graph;
+    
+    // curr当前数字
+    // 还有多少个结点需要构建，初始值为n-1
+    int dfs(int curr, int rest)
     {
+        // cnt 计数减1
+        --num2cnt[curr];
+        // 对于最后一个数字，直接返回1
+        int res = 1;
+        if (rest != 0) {
+            // 非最后一个数字默认为0
+            res = 0;
+            for (int next : graph[curr])
+            {
+                if (num2cnt[next] > 0)
+                {
+                    // 递归下一个结点
+                    res += dfs(next, rest - 1);
+                }
+            }
+        }
+        // 回溯
+        ++ num2cnt[curr];
+        return res;
+    }
 
-        sort(nums.begin(),nums.end());
-        set<vector<int>, cmp> mm;
-        vector<int> index(nums.size(),0);
-        for (int i=0;i<index.size();i++)
-        {
-            index[i] = i;
-        }
-        vector<int> nums_last(nums.size(),0);
-        vector<int> nums_cur(nums);
-        int ans = 0;
-        while(1)
-        {
-            getIndexOrder(nums, nums_cur, index);
-            if(equal(nums_last, nums_cur))
-            {
-                if(nextIndex(index))
-                {
-                    continue;
-                }
-                else
-                {
-                    break;
-                }
-                continue;
-            }
-            else
-            {
-                nums_last = nums_cur;
-            }
-            if(check(nums_cur))
-            {
-                if(mm.count(nums_cur)==0)
-                {
-                    ans++;
-                    mm.insert(nums_cur);
-                }
-            }
-            if(nextIndex(index))
-            {
-                continue;
-            }
-            else
-            {
-                break;
-            }
-        }
-        return ans;
-    }
-private:
-    void getIndexOrder(vector<int>& nums, vector<int>& nums_cur, vector<int>& index)
+    bool isSqureful(int x, int y)
     {
-        for (int i=0;i<nums.size();i++)
-        {
-            nums_cur[i] = nums[index[i]];
-        }
+        int r = (int)(sqrt(x+y));
+        return r*r == x + y;
     }
-    bool equal(vector<int>& n1, vector<int>& n2)
-    {
-        for (int i=0;i<n1.size();i++)
+
+public:
+    int numSquarefulPerms(vector<int>& nums) {
+        for (int num : nums)
         {
-            if(n1[i] !=n2[i])
-            {
-                return false;
-            }
+            ++num2cnt[num];
         }
-        return true;
-    }
-    bool check(vector<int>& nums)
-    {
-        int sum = 0;
-        int ss = 0;
-        for (int i=0;i<nums.size()-1;i++)
+
+        for (auto i1 = num2cnt.begin(); i1 != num2cnt.end(); ++i1)
         {
-            sum = nums[i]+nums[i+1];
-            ss = sqrt((double)sum);
-            if(sum!=ss*ss)
+            for (auto i2 = num2cnt.begin(); i2 != num2cnt.end(); ++i2)
             {
-                return false;
-            }
-        }
-        return true;
-    }
-    bool nextIndex(vector<int>& index)
-    {
-        for (int i=index.size()-1;i>=1;i--)
-        {
-            if(index[i]>index[i-1])
-            {
-                int min_index = i;
-                for (int j=i;j<index.size();j++)
+                if (isSqureful(i1->first, i2->first))
                 {
-                    if(index[i-1] < index[j] && index[j] < index[min_index])
-                    {
-                        min_index = j;
-                    }
-                }
-                swap(index[min_index],index[i-1]);
-                sort(index.begin()+i,index.end());
-                return true;
-            }
-        }
-        return false;
-    }
-private:
-    struct cmp
-    {
-        bool operator()(const vector<int>& a, const vector<int>& b)const
-        {
-            for (int i=0;i<a.size();i++)
-            {
-                if(a[i]<b[i])
-                {
-                    return true;
-                }
-                else if(a[i]>b[i])
-                {
-                    return false;
+                    graph[i1->first].push_back(i2->first);
                 }
             }
-            return false;
         }
-    };
+
+        int res = 0;
+        // 从每个点开始去计算可行路径
+        int n = nums.size();
+        for (auto i1 = num2cnt.begin(); i1 != num2cnt.end(); ++i1)
+        {
+            res += dfs(i1->first, n-1);
+        }
+
+        return res;
+    }
 };
+
 // int main()
 // {
 //     Solution s;
