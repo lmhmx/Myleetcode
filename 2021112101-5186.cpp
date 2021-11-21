@@ -2,12 +2,6 @@
 # include <map>
 # include <algorithm>
 using namespace std;
-struct NodeVal{
-    vector<int> arr;
-    int low;
-    int high;
-};
-typedef NodeVal T;
 struct binNode{
     binNode(binNode* parent = nullptr,binNode* left = nullptr,binNode* right = nullptr)
     {
@@ -15,19 +9,25 @@ struct binNode{
         this->right = right;
         this->parent = parent;
     }
-    binNode(T& val)
+    binNode(int low, int high, vector<int>& arr)
     {
-        this->val = val;
+        this->low = low;
+        this->high = high;
+        this->arr = arr;
         this->left = nullptr;
         this->right = nullptr;
         this->parent = nullptr;
     }
     
-    void setVal(T& val)
+    void setVal(int low, int high, vector<int>& arr)
     {
-        this->val = val;
+        this->low = low;
+        this->high = high;
+        this->arr = arr;
     }
-    T val;
+    int low;
+    int high;
+    vector<int> arr;
     binNode* left;
     binNode* right;
     binNode* parent;
@@ -62,7 +62,7 @@ public:
     }
     void clear()
     {
-        clear(root);
+        // clear(root);
     }
     
     ~binTree()
@@ -107,22 +107,22 @@ private:
     {
         int ans = 0;
         // node 的 大小如果是1，那么必符合两端都符合，如果不同，说明node的范围过大，node必有两个孩子
-        if(left==node->val.low&&right == node->val.high-1)
+        if(left==node->low&&right == node->high-1)
         {
-            ans = queryNum(node->val.arr, value);
+            ans = queryNum(node->arr, value);
         }
-        else if(left > node->left->val.high - 1)
+        else if(left > node->left->high - 1)
         {
             ans = querylayer(left, right, value, node->right);
         }
-        else if(right < node->left->val.high)
+        else if(right < node->left->high)
         {
             ans = querylayer(left, right, value, node->left);
         }
         else
         {
-            ans = querylayer(left, node->left->val.high-1, value, node->left);
-            ans = ans + querylayer(node->right->val.low, right, value, node->right);
+            ans = querylayer(left, node->left->high-1, value, node->left);
+            ans = ans + querylayer(node->right->low, right, value, node->right);
         }
         return ans;
     }
@@ -157,12 +157,8 @@ private:
     {
         vector<int> a(arr.begin()+low, arr.begin()+high);
         sort(a.begin(),a.end());
-        NodeVal val;
-        val.low = low;
-        val.high = high;
-        val.arr = a;
 
-        root->setVal(val);
+        root->setVal(low, high, a);
         if(high-low==1)
         {
             return;
