@@ -16,24 +16,35 @@ struct TreeNode {
 };
 
 # include <vector>
+# include <list>
 using namespace std;
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
         vector<int> ans;
-        preorderTraversal(root, ans);
-        return ans;
-    }
-private:
-    void preorderTraversal(TreeNode* root, vector<int>&ans)
-    {
-        if(root==nullptr)
+        list<TreeNode*> nodes;
+        TreeNode* p = root;
+        if(root!=nullptr)
         {
-            return;
+            nodes.push_back(root);
         }
-        ans.push_back(root->val);
-        preorderTraversal(root->left, ans);
-        preorderTraversal(root->right, ans);
+        while(!nodes.empty())
+        {
+            p = nodes.front();
+            nodes.pop_front();
+            if(p->right!=nullptr)
+            {
+                nodes.push_front(p->right);
+            }
+            if(p->left!=nullptr)
+            {
+                nodes.push_front(p->left);
+            }
+            ans.push_back(p->val);
+            
+            
+        }
+        return ans;
     }
 };
 // @lc code=end
